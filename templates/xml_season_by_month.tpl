@@ -12,7 +12,7 @@
     canvasBgDepth="0"
     use3DLighting="1"
 >
-{% for month,inches in measures.items %}
-    <set name="{{ month }}" value="{{ inches }}" color="FFFFFF"/>
+{% for measure in measures %}
+    <set name="{{ measure.month }}" value="{{ measure.inches }}" color="FFFFFF"/>
 {% endfor %}
 </graph>

@@ -22,3 +22,9 @@ def get_current_season():
     except ObjectDoesNotExist:
         season_name = "%s-%s" % (str(year - 1), str(year))
         return modes.SnowSeason.objects.get(name=season_name)
+
+def sort_month_measures(item1, item2):
+    if item1[1]['timestamp'] < item2[1]['timestamp']:
+        return -1
+    else:
+        return 1

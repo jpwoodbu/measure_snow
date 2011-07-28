@@ -12,7 +12,7 @@
     maxColWidth="50"
     use3DLighting="1"
 >
-{% for season,inches in measures.items %}
-    <set name="{{ season }}" value="{{ inches }}" color="FFFFFF"/>
+{% for measure in measures %}
+    <set name="{{ measure.season }}" value="{{ measure.inches }}" color="FFFFFF"/>
 {% endfor %}
 </graph>
