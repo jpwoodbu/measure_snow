@@ -43,3 +43,5 @@ mm/dd/yy,inches with one decimal place
             except ValidationError:
                 self.stderr.write('The row(%r) likely has a value for inches that cannot be parsed. Skipping this row...\n' % row)
                 continue
+
+        csv_fh.close()
