@@ -1,4 +1,4 @@
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.template import Context, loader
 from measure_snow import models
@@ -13,7 +13,7 @@ def show_season_by_measure(request, season_name):
     """
     try:
         season = models.SnowSeason.objects.get(name=season_name)
-    except ObjectDoesNotExist:
+    except models.SnowSeason.DoesNotExist:
         return HttpResponse("That season does not exist.")
 
     measures = models.SnowfallMeasure.objects.filter(season=season).order_by('timestamp')
@@ -35,31 +35,37 @@ def show_season_by_month(request, season_name):
     The XML returned is meant to be consumed by FusionCharts.
 
     """
+    cache_key = 'measure_snow.views.show_season_by_month.month_measures.' + season_name
+    month_measures = cache.get(cache_key)
+
     try:
         season = models.SnowSeason.objects.get(name=season_name)
-    except ObjectDoesNotExist:
+    except models.SnowSeason.DoesNotExist:
         return HttpResponse("That season does not exist.")
 
-    all_measures = models.SnowfallMeasure.objects.filter(season=season).order_by('timestamp')
+    if month_measures == None:
+        all_measures = models.SnowfallMeasure.objects.filter(season=season).order_by('timestamp')
 
 # Aggregate the measures by month into a list in chronological order.  Since
 # the measures themselves are ordered by timestamp we just have to be careful
 # to make a single list element for each month.
-    month_measures = []
-    current_index = None
-    prev_month = None
-    for measure in all_measures:
+        month_measures = []
+        current_index = None
+        prev_month = None
+        for measure in all_measures:
 # Get the month abbreviation
-        month = measure.timestamp.strftime("%b")
-        if prev_month == month:
-            month_measures[current_index]['inches'] += measure.inches
-        elif current_index != None:
-            month_measures.append({'month': month, 'inches': measure.inches})
-            current_index += 1
-        else:
-            month_measures.append({'month': month, 'inches': measure.inches})
-            current_index = 0
-        prev_month = month
+            month = measure.timestamp.strftime("%b")
+            if prev_month == month:
+                month_measures[current_index]['inches'] += measure.inches
+            elif current_index != None:
+                month_measures.append({'month': month, 'inches': measure.inches})
+                current_index += 1
+            else:
+                month_measures.append({'month': month, 'inches': measure.inches})
+                current_index = 0
+            prev_month = month
+
+        cache.set(cache_key, month_measures)
 
     t = loader.get_template('xml_season_by_month.tpl')
     c = Context({
@@ -79,24 +85,29 @@ def show_season_summaries(request):
     The XML returned is meant to be consumed by FusionCharts.
 
     """
-    all_measures = models.SnowfallMeasure.objects.all().order_by('timestamp')
+    cache_key = 'measure_snow.views.show_season_summaries.season_measures'
+    season_measures = cache.get(cache_key)
+    if season_measures == None:
+        all_measures = models.SnowfallMeasure.objects.all().order_by('-timestamp')
 
 # Aggregate the measures by season into a list in chronological order.  Since
 # the measures themselves are ordered by timestamp we just have to be careful
 # to make a single list element for each season.
-    season_measures = []
-    current_index = None
-    prev_season = None
-    for measure in all_measures:
-        if prev_season == measure.season:
-            season_measures[current_index]['inches'] += measure.inches
-        elif current_index != None:
-            season_measures.append({'season': measure.season, 'inches': measure.inches})
-            current_index += 1
-        else:
-            season_measures.append({'season': measure.season, 'inches': measure.inches})
-            current_index = 0
-        prev_season = measure.season
+        season_measures = []
+        current_index = None
+        prev_season = None
+        for measure in all_measures:
+            if prev_season == measure.season:
+                season_measures[current_index]['inches'] += measure.inches
+            elif current_index != None:
+                season_measures.append({'season': measure.season, 'inches': measure.inches})
+                current_index += 1
+            else:
+                season_measures.append({'season': measure.season, 'inches': measure.inches})
+                current_index = 0
+            prev_season = measure.season
+
+        cache.set(cache_key, season_measures)
 
     t = loader.get_template('xml_season_summaries.tpl')
     c = Context({

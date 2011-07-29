@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db import models
 from measure_snow.util import get_current_season
 
