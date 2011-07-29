@@ -1,3 +1,5 @@
 This django app was meant to help my Dad enter and store snowfall measures that
 will be displayed by FusionCharts (http://www.fusioncharts.com/).  This app
 replaces his old method of manually creating and editing XML files.
+
+This app does require caching.
