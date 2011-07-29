@@ -118,3 +118,32 @@ def show_season_summaries(request):
     response['Content-Type'] = 'application/xml'
     
     return response
+
+
+def show_season_summary(request, season_name):
+    """Returns XML with a sum of SnowfallMeasures for a season 
+
+    The XML returned is meant to be consumed by FusionCharts.
+
+    """
+    try:
+        season = models.SnowSeason.objects.get(name=season_name)
+    except models.SnowSeason.DoesNotExist:
+        return HttpResponse("That season does not exist.")
+
+    measures = models.SnowfallMeasure.objects.filter(season=season).order_by('timestamp')
+
+    measure_sum = 0
+    for measure in measures:
+        measure_sum += measure.inches
+
+    t = loader.get_template('xml_season_summary.tpl')
+    c = Context({
+        'season': season,
+        'measure_sum': measure_sum,
+    })
+
+    response = HttpResponse(t.render(c))
+    response['Content-Type'] = 'application/xml'
+    
+    return response

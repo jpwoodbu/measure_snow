@@ -16,6 +16,6 @@
     maxColWidth="35"
 >
 {% for measure in measures %}
-    <set name="{{ measure.timestamp|date:"n/j" }}" value="{{ measure.inches }}" color="FFFFFF"/>
+    <set name="{{ measure.timestamp|date:"n/j" }}" toolText="{{ measure.timestamp|date:"g:iA" }}" value="{{ measure.inches }}" color="FFFFFF"/>
 {% endfor %}
 </graph>
