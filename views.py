@@ -51,14 +51,14 @@ def show_season_by_month(request, season_name):
     for measure in all_measures:
 # Get the month abbreviation
         month = measure.timestamp.strftime("%b")
-        if current_index == None:
-            month_measures.append({'month': month, 'inches': measure.inches})
-            current_index = 0
-        elif prev_month == month:
+        if prev_month == month:
             month_measures[current_index]['inches'] += measure.inches
-        else:
+        elif current_index != None:
             month_measures.append({'month': month, 'inches': measure.inches})
             current_index += 1
+        else:
+            month_measures.append({'month': month, 'inches': measure.inches})
+            current_index = 0
         prev_month = month
 
     t = loader.get_template('xml_season_by_month.tpl')
@@ -83,19 +83,19 @@ def show_season_summaries(request):
 
 # Aggregate the measures by season into a list in chronological order.  Since
 # the measures themselves are ordered by timestamp we just have to be careful
-# to make a single list element for each month.
+# to make a single list element for each season.
     season_measures = []
     current_index = None
     prev_season = None
     for measure in all_measures:
-        if current_index == None:
-            season_measures.append({'season': measure.season, 'inches': measure.inches})
-            current_index = 0
-        elif prev_season == measure.season:
+        if prev_season == measure.season:
             season_measures[current_index]['inches'] += measure.inches
-        else:
+        elif current_index != None:
             season_measures.append({'season': measure.season, 'inches': measure.inches})
             current_index += 1
+        else:
+            season_measures.append({'season': measure.season, 'inches': measure.inches})
+            current_index = 0
         prev_season = measure.season
 
     t = loader.get_template('xml_season_summaries.tpl')
