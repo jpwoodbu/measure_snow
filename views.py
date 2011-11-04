@@ -88,7 +88,7 @@ def show_season_summaries(request):
     cache_key = 'measure_snow.views.show_season_summaries.season_measures'
     season_measures = cache.get(cache_key)
     if season_measures == None:
-        all_measures = models.SnowfallMeasure.objects.all().order_by('-timestamp')
+        all_measures = models.SnowfallMeasure.objects.all().order_by('timestamp')
 
 # Aggregate the measures by season into a list in chronological order.  Since
 # the measures themselves are ordered by timestamp we just have to be careful
