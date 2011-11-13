@@ -13,6 +13,9 @@ class SnowSeason(models.Model):
     """
     name = models.CharField(max_length=11)
 
+    class Meta:
+        ordering = ["name"]
+
     def __unicode__(self):
         return self.name
 
