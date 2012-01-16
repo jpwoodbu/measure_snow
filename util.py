@@ -21,4 +21,4 @@ def get_current_season():
         return models.SnowSeason.objects.get(name=season_name)
     except ObjectDoesNotExist:
         season_name = "%s-%s" % (str(year - 1), str(year))
-        return modes.SnowSeason.objects.get(name=season_name)
+        return models.SnowSeason.objects.get(name=season_name)
