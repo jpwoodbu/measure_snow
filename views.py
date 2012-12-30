@@ -1,3 +1,5 @@
+from datetime import datetime
+import decimal
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.template import Context, loader
@@ -147,3 +149,24 @@ def show_season_summary(request, season_name):
     response['Content-Type'] = 'application/xml'
     
     return response
+
+
+def show_sum_for_today(request):
+    """Returns how many inches of snow has fallen today
+
+    The return value is a plain-text numeric value, useful for fetching with
+    javascript.
+
+    """
+    now = datetime.now()
+    sum_snowfall = decimal.Decimal("0.0")
+    try:
+        measures = models.SnowfallMeasure.objects.filter(
+            timestamp__year=now.year, timestamp__month=now.month,
+            timestamp__day=now.day)
+    except models.SnowfallMeasure.DoesNotExist:
+        # If we have no SnowfallMeasure for today, then returning 0.0 is fine.
+        pass
+    for measure in measures:
+        sum_snowfall += measure.inches    
+    return HttpResponse(sum_snowfall)
