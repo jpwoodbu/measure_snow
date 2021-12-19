@@ -2,6 +2,7 @@ from django.core.cache import cache
 from django.db import models
 from measure_snow.util import get_current_season
 
+
 class SnowSeason(models.Model):
     """SnowSeason represents the time of the year that snow tends to fall.
 
@@ -16,15 +17,16 @@ class SnowSeason(models.Model):
     class Meta:
         ordering = ["name"]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class SnowfallMeasure(models.Model):
     """SnowfallMeasure is a mesaure of snowfall at any given time."""
 
-    season = models.ForeignKey(SnowSeason, default=get_current_season)
+    season = models.ForeignKey(SnowSeason, default=get_current_season,
+        on_delete=models.CASCADE)
     timestamp = models.DateTimeField()
     inches = models.DecimalField(max_digits=4, decimal_places=1)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.timestamp.ctime()

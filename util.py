@@ -1,6 +1,6 @@
 from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
-import models
+from . import models
 
 def get_current_season():
     """Try to return the current Season

@@ -2,7 +2,7 @@ from datetime import datetime
 import decimal
 from django.core.cache import cache
 from django.http import HttpResponse
-from django.template import Context, loader
+from django.template import loader
 from measure_snow import models
 from measure_snow import util
 
@@ -20,12 +20,12 @@ def show_season_by_measure(request, season_name):
 
     measures = models.SnowfallMeasure.objects.filter(season=season).order_by('timestamp')
     t = loader.get_template('xml_season_by_measure.tpl')
-    c = Context({
+    context = {
         'season_name': season.name,
         'measures': measures,
-    })
+    }
 
-    response = HttpResponse(t.render(c))
+    response = HttpResponse(t.render(context))
     response['Content-Type'] = 'application/xml'
     
     return response
@@ -70,19 +70,19 @@ def show_season_by_month(request, season_name):
         cache.set(cache_key, month_measures)
 
     t = loader.get_template('xml_season_by_month.tpl')
-    c = Context({
+    context = {
         'season_name': season.name,
         'measures': month_measures,
-    })
+    }
 
-    response = HttpResponse(t.render(c))
+    response = HttpResponse(t.render(context))
     response['Content-Type'] = 'application/xml'
     
     return response
 
 
 def show_season_summaries(request):
-    """Returns XML with a sum of SnowfallMeasures by seaon
+    """Returns XML with a sum of SnowfallMeasures by season
 
     The XML returned is meant to be consumed by FusionCharts.
 
@@ -112,11 +112,9 @@ def show_season_summaries(request):
         cache.set(cache_key, season_measures)
 
     t = loader.get_template('xml_season_summaries.tpl')
-    c = Context({
-        'measures': season_measures,
-    })
+    context = {'measures': season_measures}
 
-    response = HttpResponse(t.render(c))
+    response = HttpResponse(t.render(context))
     response['Content-Type'] = 'application/xml'
     
     return response
@@ -140,12 +138,12 @@ def show_season_summary(request, season_name):
         measure_sum += measure.inches
 
     t = loader.get_template('xml_season_summary.tpl')
-    c = Context({
+    context = {
         'season': season,
         'measure_sum': measure_sum,
-    })
+    }
 
-    response = HttpResponse(t.render(c))
+    response = HttpResponse(t.render(context))
     response['Content-Type'] = 'application/xml'
     
     return response
